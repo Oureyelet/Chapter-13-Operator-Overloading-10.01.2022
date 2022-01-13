@@ -1,4 +1,5 @@
 #include <iostream>
+#include <numeric> // for std::gcd()
 
 class Cents
 {
@@ -130,6 +131,7 @@ public:
     Fraction(int num, int deno=1)
         : m_numerator{ num }, m_denominator{ deno }
     {
+        reduce();
     }
 
     void print()
@@ -143,6 +145,17 @@ public:
 	// our functions wouldn't work with r-values.
     friend Fraction operator*(const Fraction& f1, const Fraction& f2);
     friend Fraction operator*(const Fraction& f1, int value);
+
+    void reduce()
+    {
+        int gcd{ std::gcd(m_numerator, m_denominator) };
+
+        if(gcd)
+        {
+            m_numerator /= gcd;
+            m_denominator /= gcd;
+        }
+    }
  
 };
 
@@ -380,10 +393,48 @@ int main()
     previous solution?
 
     // We can remove these operators, and the program continues to work
-    
     Fraction operator*(const Fraction& f1, int value);
     Fraction operator*(int value, const Fraction& f1);
     */
+
+    /*
+    e) Extra credit: the fraction 2/4 is the same as 1/2, but 2/4 is not reduced to the lowest terms. We can reduce any 
+    given fraction to lowest terms by finding the greatest common divisor (GCD) between the numerator and denominator, and 
+    then dividing both the numerator and denominator by the GCD.
+
+    std::gcd was added to the standard library in C++17 (in the <numeric> header).
+
+    If you’re on an older compiler, you can use this function to find the GCD:
+    
+    Write a member function named reduce() that reduces your fraction. Make sure all fractions are properly reduced.
+
+    The following should compile:
+    */
+    std::cout << "After GCD: " << '\n';
+
+    Fraction f11{2, 5};
+    f11.print();
+
+    Fraction f22{3, 8};
+    f22.print();
+
+    Fraction f33{ f11 * f22 };
+    f33.print();
+
+    Fraction f44{ f11 * 2 };
+    f44.print();
+
+    Fraction f55{ 2 * f22 };
+    f55.print();
+
+    Fraction f66{ Fraction{1, 2} * Fraction{2, 3} * Fraction{3, 4} };
+    f66.print();
+
+    Fraction f77{0, 6};
+    f77.print();
+
+    
+
 
 
     return 0;
