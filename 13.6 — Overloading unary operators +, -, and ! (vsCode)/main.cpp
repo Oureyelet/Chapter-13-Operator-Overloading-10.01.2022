@@ -61,6 +61,11 @@ public:
     // Return true if the point is set at the origin
     bool operator! () const;
 
+    void print()
+    {
+        std::cout << m_x << ' ' << m_y << ' ' << m_z << '\n';
+    }
+
     double get_X() const { return m_x; }
     double get_Y() const { return m_y; }
     double get_Z() const { return m_z; }
@@ -68,7 +73,7 @@ public:
 
 // Convert a Point into its negative equivalent
 Point Point::operator- () const
-{
+{   
     return { -m_x, -m_y, -m_z }; 
 }
 
@@ -167,8 +172,7 @@ int main()
     */
     Point point2{ -3.3, -5, -2.3 };
 
-    std::cout << (-point2).get_X() << '\n';
-
+    (-point2).print();
 
 
     return 0;
