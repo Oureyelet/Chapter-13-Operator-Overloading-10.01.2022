@@ -52,7 +52,6 @@ public:
     {
     }
 
-
     // Convert a Point into its negative equivalent
     Point operator- () const;
 
@@ -62,10 +61,6 @@ public:
     // Return true if the point is set at the origin
     bool operator! () const;
 
-    //overloading output friend function <<
-    friend std::ostream& operator<<(std::ostream& out,const Point& point);
-
-
     double get_X() const { return m_x; }
     double get_Y() const { return m_y; }
     double get_Z() const { return m_z; }
@@ -74,7 +69,7 @@ public:
 // Convert a Point into its negative equivalent
 Point Point::operator- () const
 {
-    return Point { -m_x, -m_y, -m_z }; 
+    return { -m_x, -m_y, -m_z }; 
 }
 
 // Return true if the point is set at the origin, false otherwise
@@ -85,14 +80,7 @@ bool Point::operator! () const
 
 Point Point::operator+ () const
 {
-    return { +m_x, +m_y, +m_z };
-}
-
-std::ostream& operator<<(std::ostream& out,const Point& point)
-{
-    out << point.get_X() << point.get_Y() << point.get_Z();
-
-    return out;
+    return Point(m_x, m_y, m_z);
 }
 
 int main()
@@ -177,9 +165,10 @@ int main()
     /*
     Implement overloaded operator+ for the Point class.
     */
-    Point point2{ 3.3, -7.7, -33.9 };
+    Point point2{ -3.3, -5, -2.3 };
 
-    std::cout << (+point2);
+    std::cout << (-point2).get_X() << '\n';
+
 
 
     return 0;
