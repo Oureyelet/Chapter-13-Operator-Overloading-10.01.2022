@@ -1,4 +1,6 @@
 #include <iostream>
+#include <cassert>// for asser()
+#include <array>// for std::size()
 
 class IntList
 {
@@ -39,6 +41,42 @@ const int& IntList::operator[] (int index) const// for const objects: can only b
 {
     return m_second_list[index];
 }
+
+class DoubleList
+{
+private:
+    double m_list[10]{};
+
+public:
+    DoubleList() = default;
+
+    double& operator[](int index);
+
+};
+
+double& DoubleList::operator[](int index)
+{
+    assert(index >= 0 && index < std::size(m_list));
+
+    return m_list[index];
+}
+
+class Stupid
+{
+private:
+
+public:
+    void operator[] (const std::string& index);
+
+};
+
+// It doesn't make sense to overload operator[] to print something
+// but it is the easiest way to show that the function parameter can be a non-integer
+void Stupid::operator[] (const std::string& index)
+{
+    std::cout << index;
+}
+
 
 int main()
 {
@@ -179,7 +217,105 @@ int main()
     std::cout << "//////////////////////////////////////////////////////////////////////////////////////////" << '\n';
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /*
+    One other advantage of overloading the subscript operator is that we can make it safer than accessing arrays directly. 
+    Normally, when accessing arrays, the subscript operator does not check whether the index is valid. For example, the compiler 
+    will not complain about the following code:
     */
+    int f_list[5]{};
+    f_list[7] = 3; // index 7 is out of bounds!
+
+    /*
+    However, if we know the size of our array, we can make our overloaded subscript operator check to ensure the 
+    index is within bounds:
+    */
+    DoubleList ok_list{};
+    ok_list[5] = 12;
+
+    /*
+    In the above example, we have used the assert() function (included in the cassert header) to make sure our index is valid. 
+    If the expression inside the assert evaluates to false (which means the user passed in an invalid index), the program will 
+    terminate with an error message, which is much better than the alternative (corrupting memory). This is probably the most 
+    common method of doing error checking of this sort.
+    */
+
+
+    std::cout << std::endl;
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    std::cout << "//////////////////////////////////////////////////////////////////////////////////////////" << '\n';
+    std::cout << "Pointers to objects and overloaded operator[] don’t mix" << '\n';
+    std::cout << "//////////////////////////////////////////////////////////////////////////////////////////" << '\n';
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /*
+    Rule
+
+    Make sure you’re not trying to call an overloaded operator[] on a pointer to an object.
+    
+    The proper syntax would be to dereference the pointer first (making sure to use parenthesis since operator[] has higher 
+    precedence than operator*), then call operator[]:
+    */
+    IntList* p_list{ new IntList{} };
+    (*p_list)[2] = 3; // get our IntList object, then call overloaded operator[]
+    delete p_list;
+
+    //This is ugly and error prone. Better yet, don’t set pointers to your objects if you don’t have to.
+
+
+    std::cout << std::endl;
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    std::cout << "//////////////////////////////////////////////////////////////////////////////////////////" << '\n';
+    std::cout << "The function parameter does not need to be an integer" << '\n';
+    std::cout << "//////////////////////////////////////////////////////////////////////////////////////////" << '\n';
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /*
+    As mentioned above, C++ passes what the user types between the hard braces as an argument to the overloaded function. 
+    In most cases, this will be an integer value. However, this is not required -- and in fact, you can define that your 
+    overloaded operator[] take a value of any type you desire. You could define your overloaded operator[] to take a double, 
+    a std::string, or whatever else you like.
+
+    As a ridiculous example, just so you can see that it works:
+    */
+    Stupid stupid{};
+    stupid[ "Hello, world" ];
+
+    /*
+    As you would expect, this prints:
+
+    Hello, world!
+
+    Overloading operator[] to take a std::string parameter can be useful when writing certain kinds of classes, such as those 
+    that use words as indices.
+    */
+
+
+    std::cout << std::endl;
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    std::cout << "//////////////////////////////////////////////////////////////////////////////////////////" << '\n';
+    std::cout << "Conclusion" << '\n';
+    std::cout << "//////////////////////////////////////////////////////////////////////////////////////////" << '\n';
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /*
+    The subscript operator is typically overloaded to provide direct access to individual elements from an array 
+    (or other similar structure) contained within a class. Because strings are often implemented as arrays of characters, 
+    operator[] is often implemented in string classes to allow the user to access a single character of the string.
+    */
+
+
+    std::cout << std::endl;
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    std::cout << "//////////////////////////////////////////////////////////////////////////////////////////" << '\n';
+    std::cout << "Quiz Time" << '\n';
+    std::cout << "//////////////////////////////////////////////////////////////////////////////////////////" << '\n';
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /*
+    Question #1
+
+    A map is a class that stores elements as a key-value pair. The key must be unique, and is used to access the associated pair. 
+    In this quiz, we’re going to write an application that lets us assign grades to students by name, using a simple map class. 
+    The student’s name will be the key, and the grade (as a char) will be the value.
+
+    a) First, write a struct named StudentGrade that contains the student’s name (as a std::string) and grade (as a char).
+    */
+    
 
 
     return 0;
