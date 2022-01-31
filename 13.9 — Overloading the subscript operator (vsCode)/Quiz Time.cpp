@@ -4,17 +4,13 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <string_view>
+#include <map> // for std::map
 
-bool constainsName(std::string_view name)
-{
-    return (name.find(name) != std::string_view::npos);
-}
 
 struct StudentGrade
 {
-    std::string name{};
-    char grade{};
+	std::string name{};
+	char grade{};
 };
 
 class GradeMap
@@ -25,23 +21,26 @@ private:
 public:
     GradeMap() = default;
 
-    std::string& operator[](std::string map); 
+    char& operator[](const std::string& name); 
 };
 
 
-std::string& GradeMap::operator[](std::string name, char grade)
+char& GradeMap::operator[](const std::string& name)
 {
-    auto found{ std::find_if( m_map.begin(), m_map.end(), constainsName ) };
+    auto found{ std::find_if(m_map.begin(), m_map.end(),
+                                [&](const auto& student)
+                                {
+                                    return (student.name == name);
+                                }) };
 
-    if(found == m_map.end())
+    if(found != m_map.end())
     {
-        return name;
+        return found->grade;
     }
-    else
-    {
-        StudentGrade student = { name }
-    }
+    
+    m_map.push_back({ name });
 
+    return m_map.back().grade;
 }
 
 
@@ -74,10 +73,59 @@ int main()
 
     The following program should run:
     */
+    GradeMap grades{};
 
+	grades["Joe"] = 'A';
+	grades["Frank"] = 'B';
 
+	std::cout << "Joe has a grade of " << grades["Joe"] << '\n';
+	std::cout << "Frank has a grade of " << grades["Frank"] << '\n';
+
+    /*
+    TIP !
+   
+    Since maps are common, the standard library offers std::map, which is not currently covered on learncpp. 
+    Using std::map, we can simplify our code to
+    */
+
+    // std::map can be initialized
+    std::map<std::string, char> map_grades
+    {
+        {"Ania", 'A'},
+        {"Mateusz", 'C'}
+    };
+
+    // and assigned
+    map_grades["Tobias"] = 'A';
+    map_grades["Sofia"] = 'B';
+
+    std::cout << "Sofia has a grade of " << map_grades["Sofia"] << '\n';
+    std::cout << "Tobias has a grade of " << map_grades["Tobias"] << '\n';
+    std::cout << "Ania has a grade of " << map_grades["Ania"] << '\n';
+    std::cout << "Mateusz has a grade of " << map_grades["Mateusz"] << '\n';
+
+    //Prefer using std::map over writing your own implementation.
+
+    /*
+    Question #2
+
+    Extra credit #1: The GradeMap class and sample program we wrote is inefficient for many reasons. 
+    Describe one way that the GradeMap class could be improved.
     
+    std::vector is unsorted by nature. This means every time we call operator[], we’re potentially traversing the entire 
+    std::vector to find our element. With a few elements, this isn’t a problem, but as we continue to add names, this will 
+    become increasingly slow. We could optimize this by keeping our m_map sorted and using a binary search, so we minimize 
+    the number of elements we have to look through to find the ones we’re interested in.
+    */
 
+    /*
+    test
+    */
+    std::map<int, double> test_one
+    {
+        {7, 3.3},
+        {8, 2.2}
+    };
 
     return 0;
 }
