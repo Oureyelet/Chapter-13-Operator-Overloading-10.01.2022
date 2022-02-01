@@ -46,32 +46,45 @@ private:
     int m_counter{ 0 };
 
 public:
-    int operator() (int i) { return (m_counter += i); }
+    int operator() (int i) 
+    { 
+        return (m_counter += i); 
+    }
 
 };
 
 class String
 {
 private:
-    std::string m_str{};
+    std::string m_str;
 
 public:
-    String() = default;
+    String(const std::string& str = {})
+        : m_str{ str }
+    {
 
-    char& operator()(int index, int length);
+    }
+
+    std::string operator()(int index, int length);
 
 };
 //               012345678
 //               Niedziela
 //    3 3           dzi
 
-char& String::operator()(int index, int length)
-{                               //8
-    for(int i{ index }; i < m_str.length(); ++i)
+std::string String::operator()(int index, int length)
+{   
+    assert(index >= 0);
+    assert(index + length <= static_cast<int>(m_str.length()) && "Mystring::operator(int, int): Substring is out of range" );
+
+    std::string m_str_2;
+
+    for(int i{ 0 }; i < length; ++i)
     {
-        std::cout << m_str[i];  
+         m_str_2 += m_str[static_cast<std::string::size_type>(index+i)]; 
     }
-    std::cout << std::endl;
+    
+    return  m_str_2;
 }    
 
 int main()
@@ -212,6 +225,12 @@ int main()
     The following code should run:
     */
     String string{ "Hello, world!" };
+    std::cout << string(7, 5) << '\n';
+
+    //If you need a substring, use the std::string::substr function.
+
+    std::string JC{ "Jezus is Chrystus" };
+    std::cout << JC.substr(9, 8);
 
 
     return 0;
