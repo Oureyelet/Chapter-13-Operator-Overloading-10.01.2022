@@ -28,6 +28,28 @@ void printInt(int value)
     std::cout << value << '\n';
 }
 
+class Dollar
+{
+private:
+    int m_dollar{};
+
+public:
+    Dollar(int dollar = 0)
+        : m_dollar{ dollar }
+    {
+
+    }
+
+    operator Cents() const
+    {
+        return Cents{ m_dollar * 100 };
+    }
+};
+
+void printCents(Cents cents)
+{
+    std::cout << cents;// cents will be implicitly cast to an int here
+}
 
 
 int main()
@@ -95,6 +117,43 @@ int main()
     printInt(Oko_cents); // print 8
 
     std::cout << '\n';
+
+
+    /*
+    The compiler will first note that function printInt takes an integer parameter. Then it will note that variable cents 
+    is not an int. Finally, it will look to see if we’ve provided a way to convert a Cents into an int. Since we have, it 
+    will call our operator int() function, which returns an int, and the returned int will be passed to printInt().
+
+    We can now also explicitly cast our Cents variable to an int:
+    */
+    Cents Oson_cent{ 3 };
+    int c{ static_cast<int>(Oko_cents) };
+
+    /*
+    You can provide user-defined conversions for any data type you wish, including your own user-defined data types!
+    
+    Here’s a new class called Dollars that provides an overloaded Cents conversion:
+    */
+
+    //see our Dollar class please
+
+    /*
+    This allows us to convert a Dollars object directly into a Cents object! This allows you to do something like this:
+    */
+    Dollar dollar{ 9 };
+    printCents(dollar); // dollars will be implicitly cast to a Cents here
+
+    std::cout << '\n';
+
+    /*
+    Consequently, this program will print the value:
+
+    900
+
+    which makes sense, since 9 dollars is 900 cents!
+    */
+
+
 
     return 0;
 }
