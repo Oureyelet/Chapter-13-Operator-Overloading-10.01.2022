@@ -20,19 +20,27 @@ public:
         : m_numerator{ copy.m_numerator }, m_denominator{ copy.m_denominator }
     {
         // no need to check for a denominator of 0 here since copy must already be a valid Fraction
-        std::cout << "Copy constructor called\n";
+        std::cout << "Copy constructor called\n";// just to prove it works
     }
 
+    int getNumerator() { return m_numerator;;  }
+    void setNumerator(int numerator) { m_numerator = numerator; }
 
 
     friend std::ostream& operator<< (std::ostream& out, const Fraction& f1);
 };
 
-
 std::ostream& operator<< (std::ostream& out, const Fraction& f1)
 {
     out << f1.m_numerator << '/' << f1.m_denominator;
     return out;
+}
+
+Fraction makeNavigation(Fraction f)
+{
+    f.setNumerator( -f.getNumerator() );
+
+    return f;
 }
 
 int main()
@@ -93,7 +101,17 @@ int main()
 
     Consider:
     */
+    Fraction eightSeventh{ 8, 7 };
+    std::cout << makeNavigation( eightSeventh ) << '\n';
 
+    /*
+    The first copy constructor call happens when fiveThirds is passed as an argument into makeNegative() parameter f. The second 
+    call happens when the return value from makeNegative() is passed back to main().
+
+    In the above case, both the argument passed by value and the return value can not be elided. However, in other cases, if 
+    the argument or return value meet specific criteria, the compiler may opt to elide the copy constructor. For example:
+    */
+    // see more on  https://www.learncpp.com/cpp-tutorial/copy-initialization/
 
     return 0;
 }
