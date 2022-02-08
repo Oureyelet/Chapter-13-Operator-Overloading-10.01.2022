@@ -1,5 +1,39 @@
 #include <iostream>
 
+class Average
+{
+private:
+    std::int_least32_t sum_of_all_the_numbers{};
+    std::int_least8_t how_many_numbers_youve_seen_so_far{};
+
+public:
+    Average() = default;
+
+    Average(std::int_least32_t x, std::int_least8_t y=1)
+        : sum_of_all_the_numbers{ x }, how_many_numbers_youve_seen_so_far{ y }
+    {
+
+    }
+
+    friend std::ostream& operator<< (std::ostream& out, const Average& avg)
+    {
+        out << static_cast<double>(avg.sum_of_all_the_numbers) / avg.how_many_numbers_youve_seen_so_far << '\n';
+        
+        return out;
+    }
+
+    Average operator += (const Average& avg)
+    {   
+        sum_of_all_the_numbers += avg.sum_of_all_the_numbers;
+
+        how_many_numbers_youve_seen_so_far++;
+        
+        return *this;
+    }
+
+};
+
+
 int main()
 {
     /*
@@ -79,6 +113,34 @@ int main()
     1d) point = 5;
     */
     
+    /*
+    Write a class named Average that will keep track of the average of all integers passed to it. Use two members: The first 
+    one should be type std::int_least32_t, and used to keep track of the sum of all the numbers you’ve seen so far. 
+    The second should be of type std::int_least8_t, and used to keep track of how many numbers you’ve seen so far. 
+    You can divide them to find your average.
+    
+    2a) Write all of the functions necessary for the following program to run:
+    */
+    Average avg{};
+
+    avg += 4;
+    std::cout << avg; // 4 / 1 = 4
+
+    avg += 8;
+	std::cout << avg;// (4 + 8) / 2 = 6
+
+    avg += 24;
+	std::cout << avg;// (4 + 8 + 24) / 3 = 12
+
+    avg += -10;
+	std::cout << avg; // (4 + 8 + 24 - 10) / 4 = 6.5
+
+    (avg += 6) += 10; // 2 calls chained together
+	std::cout << avg; // (4 + 8 + 24 - 10 + 6 + 10) / 6 = 7
+
+    Average copy{ avg };
+	std::cout << copy << '\n';
+
 
     return 0;
 }

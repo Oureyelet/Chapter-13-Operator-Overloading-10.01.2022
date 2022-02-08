@@ -229,7 +229,7 @@ int main()
 
     //If you need a substring, use the std::string::substr function.
 
-    std::string JC{ "Jezus is Chrystus" };
+    std::string JC{ "Jezus is Christ" };
     std::cout << JC.substr(9, 8);
 
 
