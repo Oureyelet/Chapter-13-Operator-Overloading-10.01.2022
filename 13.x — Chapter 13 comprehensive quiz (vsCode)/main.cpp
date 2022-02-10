@@ -1,18 +1,16 @@
 #include <iostream>
+#include <cassert>// for assert()
+#include <cstdlib> // for std::size_t
 
 class Average
 {
 private:
-    std::int_least32_t sum_of_all_the_numbers{};
-    std::int_least8_t how_many_numbers_youve_seen_so_far{};
+    std::int_least32_t sum_of_all_the_numbers{ 0 };
+    std::int_least8_t how_many_numbers_youve_seen_so_far{ 0 };
 
 public:
-    Average() = default;
-
-    Average(std::int_least32_t x, std::int_least8_t y=1)
-        : sum_of_all_the_numbers{ x }, how_many_numbers_youve_seen_so_far{ y }
+    Average()
     {
-
     }
 
     friend std::ostream& operator<< (std::ostream& out, const Average& avg)
@@ -22,16 +20,68 @@ public:
         return out;
     }
 
-    Average operator += (const Average& avg)
+    Average& operator += (int num)
     {   
-        sum_of_all_the_numbers += avg.sum_of_all_the_numbers;
+        sum_of_all_the_numbers += num;
 
-        how_many_numbers_youve_seen_so_far++;
+        ++how_many_numbers_youve_seen_so_far;
         
         return *this;
     }
 
 };
+
+class IntArray
+{
+private:
+    int m_lenght{};
+    int *m_array{};
+
+public:
+    IntArray(int lenght)
+    {
+        assert(lenght > 0 && "No no no!");
+
+        m_array = new int[ static_cast<std::size_t>( lenght ) ]{};
+        m_lenght = lenght;
+    }
+
+    IntArray(const IntArray& copy)
+    {
+        m_array = copy.m_array;
+        m_lenght = copy.m_lenght;
+    }
+
+    int& operator[] (const int& arr)
+    {
+        return m_array[arr];
+    }
+
+    friend std::ostream& operator<< (std::ostream& out, const IntArray& arr)
+    {
+        out << arr.m_array;
+        
+        return out;
+    }
+
+    ~IntArray()
+    {
+        delete[] m_array;
+    }
+};
+
+IntArray fillArray()
+{
+    IntArray a(5);
+
+    a[0] = 5;
+    a[1] = 8;
+    a[2] = 2;
+    a[3] = 3;
+    a[4] = 6;
+
+    return a;
+}
 
 
 int main()
@@ -140,6 +190,27 @@ int main()
 
     Average copy{ avg };
 	std::cout << copy << '\n';
+
+    /*
+    2b) Does this class need an explicit copy constructor or assignment operator?
+    */
+
+    /*
+    Write your own integer array class named IntArray from scratch (do not use std::array or std::vector). 
+    Users should pass in the size of the array when it is created, and the array should be dynamically allocated. 
+    Use assert statements to guard against bad data. Create any constructors or overloaded operators needed to make the 
+    following program operate correctly:
+    */
+    IntArray a{ fillArray() };
+    std::cout << a << '\n';
+
+    auto& ref{ a };
+    a = ref;
+
+    IntArray b(1);
+    b = a;
+
+    std::cout << b << '\n';
 
 
     return 0;
