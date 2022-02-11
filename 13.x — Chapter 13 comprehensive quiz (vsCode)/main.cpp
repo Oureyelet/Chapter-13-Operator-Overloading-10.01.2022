@@ -34,39 +34,69 @@ public:
 class IntArray
 {
 private:
-    int m_lenght{};
-    int *m_array{};
+    int m_lenght{ 0 };
+    int *m_array{ nullptr };
 
 public:
     IntArray(int lenght)
+        : m_lenght{ lenght }
     {
         assert(lenght > 0 && "No no no!");
 
-        m_array = new int[ static_cast<std::size_t>( lenght ) ]{};
-        m_lenght = lenght;
+        m_array = new int[ m_lenght ]{};
     }
 
     IntArray(const IntArray& copy)
     {
-        m_array = copy.m_array;
-        m_lenght = copy.m_lenght;
-    }
+        m_array = new int[ m_lenght ];
 
-    int& operator[] (const int& arr)
-    {
-        return m_array[arr];
-    }
-
-    friend std::ostream& operator<< (std::ostream& out, const IntArray& arr)
-    {
-        out << arr.m_array;
-        
-        return out;
+        for(int count{ 0 }; count < copy.m_lenght; ++count)
+            m_array[count] = copy.m_array[count];
     }
 
     ~IntArray()
     {
         delete[] m_array;
+    }
+
+    int& operator[] (const int arr)
+    {
+        assert(arr >= 0);
+        assert(arr < m_lenght);
+
+        return m_array[arr];
+    }
+
+    friend std::ostream& operator<< (std::ostream& out, const IntArray& arr)
+    {
+        for(int count{ 0 }; count < arr.m_lenght; ++count)
+        {
+            out << arr.m_array[count] << ' ';
+        }
+        
+        return out;
+    }
+
+    // Assignment operator that does a deep copy
+    IntArray& operator= (const IntArray& array)
+    {
+        // self-assignment guard
+        if(this == &array)
+            return *this;
+
+        // If this array already exists, delete it so we don't leak memory
+        delete[] m_array;
+
+        m_lenght = array.m_lenght;
+
+        // Allocate a new array
+        m_array = new int[m_lenght];
+
+        // Copy elements from original array to new array
+        for(int count{ 0 }; count < array.m_lenght; ++count)
+            m_array[count] = array.m_array[count];
+
+        return *this;
     }
 };
 
@@ -211,6 +241,14 @@ int main()
     b = a;
 
     std::cout << b << '\n';
+
+    /*
+        Extra credit: This one is a little more tricky. A floating point number is a number with a decimal where the number of digits after the decimal can be variable. A fixed point number is a number with a fractional component where the number of digits in the fractional portion is fixed.
+
+    In this quiz, we’re going to write a class to implement a fixed point number with two fractional digits (e.g. 12.34, 3.00, or 1278.99). Assume that the range of the class should be -32768.99 to 32767.99, that the fractional component should hold any two digits, that we don’t want precision errors, and that we want to conserve space.
+
+    4a) What type of member variable(s) do you think we should use to implement our fixed point number with 2 digits after the decimal? (Make sure you read the answer before proceeding with the next questions)
+    */
 
 
     return 0;
