@@ -2,6 +2,7 @@
 #include <cassert>// for assert()
 #include <cstdlib> // for std::size_t
 
+
 class Average
 {
 private:
@@ -112,6 +113,27 @@ IntArray fillArray()
 
     return a;
 }
+
+class FixedPoint2
+{
+private:
+    int16_t m_point1{};
+    int16_t m_point2{};
+
+public:
+    FixedPoint2(int16_t p1, int16_t p2)
+        : m_point1{ p1 }, m_point2{ p2 }
+    {
+
+    }
+
+    friend std::ostream& operator<< (std::ostream& out, const FixedPoint2& fixedPoint)
+    {
+        out << fixedPoint.m_point1 << '.' << fixedPoint.m_point2;
+        return out;
+    }
+
+};
 
 
 int main()
@@ -243,12 +265,23 @@ int main()
     std::cout << b << '\n';
 
     /*
-        Extra credit: This one is a little more tricky. A floating point number is a number with a decimal where the number of digits after the decimal can be variable. A fixed point number is a number with a fractional component where the number of digits in the fractional portion is fixed.
+        Extra credit: This one is a little more tricky. A floating point number is a number with a decimal where the number of 
+        digits after the decimal can be variable. A fixed point number is a number with a fractional component where the number 
+        of digits in the fractional portion is fixed.
 
-    In this quiz, we’re going to write a class to implement a fixed point number with two fractional digits (e.g. 12.34, 3.00, or 1278.99). Assume that the range of the class should be -32768.99 to 32767.99, that the fractional component should hold any two digits, that we don’t want precision errors, and that we want to conserve space.
+    In this quiz, we’re going to write a class to implement a fixed point number with two fractional digits (e.g. 12.34, 3.00, 
+    or 1278.99). Assume that the range of the class should be -32768.99 to 32767.99, that the fractional component should hold 
+    any two digits, that we don’t want precision errors, and that we want to conserve space.
 
-    4a) What type of member variable(s) do you think we should use to implement our fixed point number with 2 digits after the decimal? (Make sure you read the answer before proceeding with the next questions)
+    4a) What type of member variable(s) do you think we should use to implement our fixed point number with 2 digits after the 
+    decimal? (Make sure you read the answer before proceeding with the next questions)
+    
+    4b) Write a class named FixedPoint2 that implements the recommended solution from the previous question. If either (or both) 
+    of the non-fractional and fractional part of the number are negative, the number should be treated as negative. 
+    Provide the overloaded operators and constructors required for the following program to run:
     */
+    FixedPoint2 aa{ 34, 56 };
+    std::cout << aa << '\n';
 
 
     return 0;
