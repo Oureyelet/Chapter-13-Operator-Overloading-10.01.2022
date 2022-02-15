@@ -14,7 +14,7 @@ public:
     // Overload Cents + int
     friend Cents operator+(const Cents& cents, int value);
 
-    // Overload Cents + int
+    // Overload Cents * int
     Cents operator*(int value);
 
     int getCents() const { return m_cents; }

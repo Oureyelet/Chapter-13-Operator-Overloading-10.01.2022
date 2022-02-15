@@ -1,6 +1,9 @@
 #include <iostream>
 #include <cassert>// for assert()
 #include <cstdlib> // for std::size_t
+#include <iomanip> // for setprecision
+#include <cstdint> // for fixed width integers
+#include <cmath> // for raund()
 
 
 class Average
@@ -117,24 +120,68 @@ IntArray fillArray()
 class FixedPoint2
 {
 private:
-    int16_t m_point1{};
-    int16_t m_point2{};
+    std::int_least32_t m_non_fractional_part_of_number{};
+    std::int_least8_t m_fractional_component{};
 
 public:
-    FixedPoint2(int16_t p1, int16_t p2)
-        : m_point1{ p1 }, m_point2{ p2 }
-    {
 
+    FixedPoint2(std::int_least32_t p1 = 0, std::int_least8_t p2 = 0)
+        : m_non_fractional_part_of_number{ p1 }, m_fractional_component{ p2 }
+    {
+        if (m_non_fractional_part_of_number < 0 || m_fractional_component < 0)
+        {
+            if(m_non_fractional_part_of_number > 0)
+                m_non_fractional_part_of_number = -m_non_fractional_part_of_number;
+            
+            if(m_fractional_component > 0)
+                m_fractional_component = -m_fractional_component;
+        }
+
+    }
+
+    FixedPoint2(double p)
+        :m_non_fractional_part_of_number{static_cast<int_least32_t>(std::round(p)) },
+        m_fractional_component{ static_cast<int_least8_t>(std::round(p * 100)- m_non_fractional_part_of_number * 100) }
+    {
+        
     }
 
     friend std::ostream& operator<< (std::ostream& out, const FixedPoint2& fixedPoint)
     {
-        out << fixedPoint.m_point1 << '.' << fixedPoint.m_point2;
+        out << static_cast<double>(fixedPoint);
         return out;
     }
 
+    operator double() const
+    {
+        return m_non_fractional_part_of_number + m_fractional_component / 100.0;
+    }
+
+    friend bool operator== (const FixedPoint2& f1, const FixedPoint2& f2)
+    {   
+        return (f1.m_non_fractional_part_of_number == f2.m_non_fractional_part_of_number &&
+                f2.m_fractional_component == f2.m_fractional_component);
+    }
+
+    FixedPoint2 operator+ () const;
+    FixedPoint2 operator- () const;
 };
 
+FixedPoint2 FixedPoint2::operator+ () const
+{
+    return FixedPoint2(m_non_fractional_part_of_number + m_fractional_component);
+}
+
+FixedPoint2 FixedPoint2::operator- () const
+{
+    return FixedPoint2(m_non_fractional_part_of_number - m_fractional_component);
+}
+
+void testAddition()
+{
+    std::cout << std::boolalpha;
+    std::cout << (FixedPoint2{ 0.75 } + FixedPoint2{ 1.23 } == FixedPoint2{ 1.98 }) << '\n';
+}
 
 int main()
 {
@@ -281,7 +328,50 @@ int main()
     Provide the overloaded operators and constructors required for the following program to run:
     */
     FixedPoint2 aa{ 34, 56 };
-    std::cout << aa << '\n';
+	std::cout << aa << '\n';
+
+	FixedPoint2 bb{ -2, 8 };
+	std::cout << bb << '\n';
+
+	FixedPoint2 c{ 2, -8 };
+	std::cout << c << '\n';
+
+	FixedPoint2 d{ -2, -8 };
+	std::cout << d << '\n';
+
+	FixedPoint2 e{ 0, -5 };
+	std::cout << e << '\n';
+
+	std::cout << static_cast<double>(e) << '\n';
+
+    /*
+    4c) Now add a constructor that takes a double. The follow program should run:
+    */
+    std::cout << "4c" << '\n';
+
+    FixedPoint2 aaa{ 0.01 };
+	std::cout << aaa << '\n';
+
+	FixedPoint2 bbb{ -0.01 };
+	std::cout << bbb << '\n';
+
+	FixedPoint2 ccc{ 5.01 }; // stored as 5.0099999... so we'll need to round this
+	std::cout << ccc << '\n';
+
+	FixedPoint2 ddd{ -5.01 }; // stored as -5.0099999... so we'll need to round this
+	std::cout << ddd << '\n';
+
+	// Handle case where the argument's decimal rounds to 100 (need to increase base by 1)
+	FixedPoint2 eee{ 106.9978 }; // should be stored with base 107 and decimal 0
+	std::cout << eee << '\n';
+
+    /*
+    4d) Overload operator==, operator >>, operator- (unary), and operator+ (binary).
+    */
+    std::cout << "4d)" << '\n';
+
+
+
 
 
     return 0;
