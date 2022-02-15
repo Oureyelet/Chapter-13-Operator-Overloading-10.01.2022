@@ -152,6 +152,14 @@ public:
         return out;
     }
 
+    friend std::istream& operator>> (std::istream& in, FixedPoint2& fixedPoint)
+    {
+        in >> fixedPoint.m_non_fractional_part_of_number;
+        in >> fixedPoint.m_fractional_component;
+
+        return in;
+    }
+
     operator double() const
     {
         return m_non_fractional_part_of_number + m_fractional_component / 100.0;
@@ -165,6 +173,9 @@ public:
 
     FixedPoint2 operator+ () const;
     FixedPoint2 operator- () const;
+
+    friend FixedPoint2 operator+(const FixedPoint2& f1, double dob);
+    friend FixedPoint2 operator-(const FixedPoint2& f1, double dob);
 };
 
 FixedPoint2 FixedPoint2::operator+ () const
@@ -174,14 +185,34 @@ FixedPoint2 FixedPoint2::operator+ () const
 
 FixedPoint2 FixedPoint2::operator- () const
 {
-    return FixedPoint2(m_non_fractional_part_of_number - m_fractional_component);
+   // return FixedPoint2(m_non_fractional_part_of_number - m_fractional_component);
+   return { static_cast<int_fast32_t>(-m_non_fractional_part_of_number), static_cast<int_fast8_t>(-m_fractional_component) };
+}
+
+
+FixedPoint2 operator+(const FixedPoint2& f1, double dob)
+{
+    return FixedPoint2(f1.m_non_fractional_part_of_number + dob, f1.m_non_fractional_part_of_number + dob);
+}
+
+FixedPoint2 operator-(const FixedPoint2& f1, double dob)
+{
+    return FixedPoint2(f1.m_non_fractional_part_of_number - dob, f1.m_non_fractional_part_of_number - dob);
 }
 
 void testAddition()
 {
     std::cout << std::boolalpha;
-    std::cout << (FixedPoint2{ 0.75 } + FixedPoint2{ 1.23 } == FixedPoint2{ 1.98 }) << '\n';
+	std::cout << (FixedPoint2{ 0.75 } + FixedPoint2{ 1.23 } == FixedPoint2{ 1.98 }) << '\n'; // both positive, no decimal overflow
+	std::cout << (FixedPoint2{ 0.75 } + FixedPoint2{ 1.50 } == FixedPoint2{ 2.25 }) << '\n'; // both positive, with decimal overflow
+	std::cout << (FixedPoint2{ -0.75 } + FixedPoint2{ -1.23 } == FixedPoint2{ -1.98 }) << '\n'; // both negative, no decimal overflow
+	std::cout << (FixedPoint2{ -0.75 } + FixedPoint2{ -1.50 } == FixedPoint2{ -2.25 }) << '\n'; // both negative, with decimal overflow
+	std::cout << (FixedPoint2{ 0.75 } + FixedPoint2{ -1.23 } == FixedPoint2{ -0.48 }) << '\n'; // second negative, no decimal overflow
+    std::cout << "false?"  << (FixedPoint2{ 0.75 } + FixedPoint2{ -1.50 } == FixedPoint2{ -0.75 }) << '\n'; // second negative, possible decimal overflow
+    std::cout << (FixedPoint2{ -0.75 } + FixedPoint2{ 1.23 } == FixedPoint2{ 0.48 }) << '\n'; // first negative, no decimal overflow
+	std::cout << "false?"  << (FixedPoint2{ -0.75 } + FixedPoint2{ 1.50 } == FixedPoint2{ 0.75 }) << '\n'; // first negative, possible decimal overflow
 }
+
 
 int main()
 {
@@ -369,6 +400,18 @@ int main()
     4d) Overload operator==, operator >>, operator- (unary), and operator+ (binary).
     */
     std::cout << "4d)" << '\n';
+
+    testAddition();
+
+    FixedPoint2 anna{ -0.48 };
+    std::cout << anna << '\n';
+
+    std::cout << -anna << '\n';
+
+    std::cout << "Enter a number:"; // enter 5.678
+    std::cin >> anna;
+
+    std::cout << "You entered:" << anna << '\n';
 
 
 
