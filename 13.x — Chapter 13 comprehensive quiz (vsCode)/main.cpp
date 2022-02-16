@@ -120,12 +120,12 @@ IntArray fillArray()
 class FixedPoint2
 {
 private:
-    std::int_least32_t m_non_fractional_part_of_number{};
+    std::int_least16_t m_non_fractional_part_of_number{};
     std::int_least8_t m_fractional_component{};
 
 public:
 
-    FixedPoint2(std::int_least32_t p1 = 0, std::int_least8_t p2 = 0)
+    FixedPoint2(std::int_least16_t p1 = 0, std::int_least8_t p2 = 0)
         : m_non_fractional_part_of_number{ p1 }, m_fractional_component{ p2 }
     {
         if (m_non_fractional_part_of_number < 0 || m_fractional_component < 0)
@@ -140,7 +140,7 @@ public:
     }
 
     FixedPoint2(double p)
-        :m_non_fractional_part_of_number{static_cast<int_least32_t>(std::round(p)) },
+        :m_non_fractional_part_of_number{static_cast<int_least16_t>(std::round(p)) },
         m_fractional_component{ static_cast<int_least8_t>(std::round(p * 100)- m_non_fractional_part_of_number * 100) }
     {
         
@@ -154,8 +154,10 @@ public:
 
     friend std::istream& operator>> (std::istream& in, FixedPoint2& fixedPoint)
     {
-        in >> fixedPoint.m_non_fractional_part_of_number;
-        in >> fixedPoint.m_fractional_component;
+        double d{};
+        in >> d;
+
+        fixedPoint = FixedPoint2{ d };
 
         return in;
     }
@@ -171,33 +173,23 @@ public:
                 f2.m_fractional_component == f2.m_fractional_component);
     }
 
-    FixedPoint2 operator+ () const;
     FixedPoint2 operator- () const;
 
     friend FixedPoint2 operator+(const FixedPoint2& f1, double dob);
-    friend FixedPoint2 operator-(const FixedPoint2& f1, double dob);
 };
 
-FixedPoint2 FixedPoint2::operator+ () const
-{
-    return FixedPoint2(m_non_fractional_part_of_number + m_fractional_component);
-}
+
 
 FixedPoint2 FixedPoint2::operator- () const
 {
    // return FixedPoint2(m_non_fractional_part_of_number - m_fractional_component);
-   return { static_cast<int_fast32_t>(-m_non_fractional_part_of_number), static_cast<int_fast8_t>(-m_fractional_component) };
+   return { static_cast<int_least16_t>(-m_non_fractional_part_of_number), static_cast<int_least8_t>(-m_fractional_component) };
 }
 
 
-FixedPoint2 operator+(const FixedPoint2& f1, double dob)
+FixedPoint2 operator+(const FixedPoint2& f1, const FixedPoint2& f2)
 {
-    return FixedPoint2(f1.m_non_fractional_part_of_number + dob, f1.m_non_fractional_part_of_number + dob);
-}
-
-FixedPoint2 operator-(const FixedPoint2& f1, double dob)
-{
-    return FixedPoint2(f1.m_non_fractional_part_of_number - dob, f1.m_non_fractional_part_of_number - dob);
+    return { static_cast<double>(f1) + static_cast<double>(f2) };
 }
 
 void testAddition()
